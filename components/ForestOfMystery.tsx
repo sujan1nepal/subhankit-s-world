@@ -34,13 +34,13 @@ const ForestOfMystery: React.FC<Props> = ({ speak }) => {
         <motion.h2 
           initial={{ y: -50, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          className="text-5xl md:text-8xl font-black text-[#d1fae5] drop-shadow-[0_8px_20px_rgba(0,0,0,0.6)] uppercase tracking-widest italic"
+          className="text-4xl md:text-7xl font-black text-[#d1fae5] drop-shadow-lg uppercase tracking-widest italic"
         >
-          Forest of Mystery
+          Forest Friends
         </motion.h2>
       </div>
 
-      <div className="relative w-full h-full p-4">
+      <div className="relative w-full h-full">
         {hidingSpots.map(spot => (
           <div 
             key={spot.id} 
@@ -53,38 +53,38 @@ const ForestOfMystery: React.FC<Props> = ({ speak }) => {
                   key={`hide-${spot.id}`}
                   initial={{ scale: 1 }}
                   animate={{ 
-                    rotate: [0, -5, 5, 0], 
-                    scale: [1, 1.15, 1],
+                    rotate: [0, -3, 3, 0], 
+                    scale: [1, 1.1, 1],
                   }}
                   transition={{ duration: 4 + Math.random(), repeat: Infinity }}
-                  whileTap={{ scale: 1.4, rotate: 20 }}
+                  whileTap={{ scale: 1.3, rotate: 10 }}
                   onClick={() => handleReveal(spot)}
-                  className="text-[10rem] md:text-[18rem] drop-shadow-[25px_25px_40px_rgba(0,0,0,0.5)] hover:brightness-125 cursor-pointer filter grayscale-[0.2]"
+                  className="text-8xl md:text-[10rem] drop-shadow-xl hover:brightness-110 cursor-pointer"
                 >
                   {spot.icon}
                 </motion.button>
               ) : (
                 <motion.div
                   key={`reveal-${spot.id}`}
-                  initial={{ scale: 0, opacity: 0, y: 100, rotate: -30 }}
-                  animate={{ scale: 1.2, opacity: 1, y: 0, rotate: 0 }}
-                  className="flex flex-col items-center gap-6"
+                  initial={{ scale: 0, opacity: 0, y: 50 }}
+                  animate={{ scale: 1.1, opacity: 1, y: 0 }}
+                  className="flex flex-col items-center gap-4"
                 >
-                  <div className="w-64 h-64 md:w-96 md:h-96 rounded-[4rem] overflow-hidden border-8 border-white shadow-[0_20px_50px_rgba(0,0,0,0.4)] clay-card bg-white">
+                  <div className="w-48 h-48 md:w-80 md:h-80 rounded-[3rem] overflow-hidden border-8 border-white shadow-2xl clay-card bg-white">
                     <img src={spot.img} alt={spot.name} className="w-full h-full object-cover" />
                   </div>
-                  <div className="bg-white/95 backdrop-blur-md px-10 py-3 rounded-[3rem] shadow-2xl border-4 border-emerald-200">
-                    <span className="text-3xl md:text-5xl font-black text-emerald-900 uppercase tracking-tighter">
+                  <div className="bg-white px-8 py-2 rounded-full shadow-lg border-2 border-emerald-100">
+                    <span className="text-2xl md:text-3xl font-black text-emerald-800 uppercase">
                       {spot.name}!
                     </span>
                   </div>
                   <motion.button 
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.9 }}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
                     onClick={() => setRevealed(prev => prev.filter(id => id !== spot.id))}
-                    className="bg-emerald-500 text-white px-8 py-3 rounded-full text-xl font-black uppercase tracking-widest shadow-xl clay-btn"
+                    className="bg-emerald-600 text-white px-6 py-2 rounded-full text-lg font-black uppercase shadow-lg clay-btn mt-2"
                   >
-                    Hide Again
+                    Hide
                   </motion.button>
                 </motion.div>
               )}
@@ -93,13 +93,13 @@ const ForestOfMystery: React.FC<Props> = ({ speak }) => {
         ))}
       </div>
 
-      <div className="absolute bottom-10 w-full text-center px-6">
+      <div className="absolute bottom-8 w-full text-center px-6">
         <motion.div 
-          animate={{ y: [0, -10, 0] }}
+          animate={{ y: [0, -5, 0] }}
           transition={{ duration: 3, repeat: Infinity }}
-          className="inline-block bg-white/20 backdrop-blur-2xl text-white px-12 py-6 rounded-[3rem] font-black text-3xl border-4 border-white/20 shadow-2xl uppercase tracking-widest"
+          className="inline-block bg-white/20 backdrop-blur-md text-white px-10 py-4 rounded-full font-black text-2xl border-2 border-white/20 shadow-xl uppercase italic"
         >
-          Can you find the hidden friends? 🔍
+          Tap the objects to find friends! 🔍
         </motion.div>
       </div>
     </div>

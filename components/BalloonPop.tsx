@@ -1,7 +1,6 @@
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import VirtualKeyboard from './VirtualKeyboard.tsx';
 
 interface Props {
   onBack: () => void;
@@ -14,26 +13,31 @@ interface Balloon {
   x: number;
   color: string;
   depth: number;
+  speed: number;
 }
 
 const COLORS = [
-  'bg-red-400 shadow-[inset_-10px_-10px_20px_rgba(0,0,0,0.2),10px_10px_20px_rgba(239,68,68,0.3)]',
-  'bg-blue-400 shadow-[inset_-10px_-10px_20px_rgba(0,0,0,0.2),10px_10px_20px_rgba(59,130,246,0.3)]',
-  'bg-green-400 shadow-[inset_-10px_-10px_20px_rgba(0,0,0,0.2),10px_10px_20px_rgba(34,197,94,0.3)]',
-  'bg-yellow-400 shadow-[inset_-10px_-10px_20px_rgba(0,0,0,0.2),10px_10px_20px_rgba(250,204,21,0.3)]',
-  'bg-purple-400 shadow-[inset_-10px_-10px_20px_rgba(0,0,0,0.2),10px_10px_20px_rgba(168,85,247,0.3)]',
-  'bg-pink-400 shadow-[inset_-10px_-10px_20px_rgba(0,0,0,0.2),10px_10px_20px_rgba(236,72,153,0.3)]',
-  'bg-orange-400 shadow-[inset_-10px_-10px_20px_rgba(0,0,0,0.2),10px_10px_20px_rgba(251,146,60,0.3)]',
+  'bg-red-400 shadow-[inset_-10px_-10px_20px_rgba(0,0,0,0.2),10px_10px_30px_rgba(239,68,68,0.4)]',
+  'bg-blue-400 shadow-[inset_-10px_-10px_20px_rgba(0,0,0,0.2),10px_10px_30px_rgba(59,130,246,0.4)]',
+  'bg-green-400 shadow-[inset_-10px_-10px_20px_rgba(0,0,0,0.2),10px_10px_30px_rgba(34,197,94,0.4)]',
+  'bg-yellow-400 shadow-[inset_-10px_-10px_20px_rgba(0,0,0,0.2),10px_10px_30px_rgba(250,204,21,0.4)]',
+  'bg-purple-400 shadow-[inset_-10px_-10px_20px_rgba(0,0,0,0.2),10px_10px_30px_rgba(168,85,247,0.4)]',
+  'bg-pink-400 shadow-[inset_-10px_-10px_20px_rgba(0,0,0,0.2),10px_10px_30px_rgba(236,72,153,0.4)]',
+  'bg-orange-400 shadow-[inset_-10px_-10px_20px_rgba(0,0,0,0.2),10px_10px_30px_rgba(251,146,60,0.4)]',
 ];
 
 const BalloonPop: React.FC<Props> = ({ speak }) => {
   const [balloons, setBalloons] = useState<Balloon[]>([]);
   const balloonsRef = useRef<Balloon[]>([]);
 
-  // Keep ref in sync for the event listener closure
   useEffect(() => {
     balloonsRef.current = balloons;
   }, [balloons]);
+
+  const pop = useCallback((id: number, char: string) => {
+    setBalloons(prev => prev.filter(b => b.id !== id));
+    speak(`Pop! ${char}!`);
+  }, [speak]);
 
   const spawnBalloon = useCallback(() => {
     const char = String.fromCharCode(65 + Math.floor(Math.random() * 26));
@@ -42,71 +46,84 @@ const BalloonPop: React.FC<Props> = ({ speak }) => {
       char,
       x: 10 + Math.random() * 80,
       color: COLORS[Math.floor(Math.random() * COLORS.length)],
-      depth: Math.random() * 100
+      depth: Math.random() * 100,
+      speed: 10 + Math.random() * 8
     };
-    setBalloons(prev => [...prev.slice(-6), newBalloon]);
+    setBalloons(prev => [...prev.slice(-15), newBalloon]);
   }, []);
 
   useEffect(() => {
-    const interval = setInterval(spawnBalloon, 2200);
+    const interval = setInterval(spawnBalloon, 1400);
     return () => clearInterval(interval);
   }, [spawnBalloon]);
 
-  const pop = useCallback((id: number, char: string) => {
-    setBalloons(prev => prev.filter(b => b.id !== id));
-    speak(`Pop! ${char}!`);
-  }, [speak]);
-
-  const processKey = useCallback((key: string) => {
-    const pressed = key.toUpperCase();
-    const target = balloonsRef.current.find(b => b.char === pressed);
-    if (target) {
-      pop(target.id, target.char);
-    }
-  }, [pop]);
-
   useEffect(() => {
-    const handleKeydown = (e: KeyboardEvent) => processKey(e.key);
+    const handleKeydown = (e: KeyboardEvent) => {
+      const pressed = e.key.toUpperCase();
+      const target = balloonsRef.current.find(b => b.char === pressed);
+      if (target) {
+        pop(target.id, target.char);
+      }
+    };
     window.addEventListener('keydown', handleKeydown);
     return () => window.removeEventListener('keydown', handleKeydown);
-  }, [processKey]);
+  }, [pop]);
 
   return (
-    <div className="w-full h-full bg-sky-50 flex flex-col items-center p-6 perspective-container">
-      <h2 className="text-4xl md:text-7xl font-black text-sky-600 z-10 mb-4 uppercase tracking-tighter drop-shadow-md">
-        Balloon Pop!
-      </h2>
+    <div className="w-full h-full bg-sky-50 flex flex-col items-center p-4 overflow-hidden">
+      <div className="z-10 text-center mb-4 shrink-0 mt-2">
+        <h2 className="text-4xl md:text-7xl font-black text-sky-600 uppercase tracking-tighter drop-shadow-sm">
+          Balloon Pop!
+        </h2>
+        <div className="mt-1 bg-white/70 backdrop-blur-md px-8 py-2 rounded-full border border-sky-200 shadow-sm inline-block">
+          <p className="text-sky-800 font-black text-lg md:text-xl uppercase tracking-widest">
+            Type the letter to pop! 🎈
+          </p>
+        </div>
+      </div>
 
-      <div className="flex-grow w-full relative overflow-hidden rounded-[3rem] bg-sky-100/30 border-8 border-white mb-6 shadow-inner">
+      <div className="flex-grow w-full relative overflow-hidden rounded-[3rem] bg-sky-100/40 border-[12px] border-white shadow-2xl clay-card mb-4">
         <AnimatePresence>
           {balloons.map(balloon => (
             <motion.div
               key={balloon.id}
-              initial={{ y: '110%', opacity: 0, scale: 0.8 }}
-              animate={{ y: '-30%', opacity: 1, scale: 1 }}
-              exit={{ scale: 4, opacity: 0, rotate: 45 }}
-              transition={{ duration: 12, ease: 'linear' }}
-              className={`absolute w-24 h-32 md:w-40 md:h-52 rounded-full ${balloon.color} border-4 border-white/40 flex items-center justify-center cursor-pointer active:scale-125 transition-transform z-[${Math.round(balloon.depth)}]`}
+              initial={{ y: '120%', opacity: 0, scale: 0.8 }}
+              animate={{ y: '-40%', opacity: 1, scale: 1 }}
+              exit={{ 
+                scale: [1, 2.5], 
+                opacity: 0, 
+                rotate: [0, 20],
+                transition: { duration: 0.2 } 
+              }}
+              transition={{ duration: balloon.speed, ease: 'linear' }}
+              className={`absolute w-32 h-44 md:w-48 md:h-64 rounded-full ${balloon.color} border-4 border-white/40 flex items-center justify-center cursor-pointer z-[${Math.round(balloon.depth)}] clay-btn`}
               style={{ left: `${balloon.x}%` }}
               onClick={() => pop(balloon.id, balloon.char)}
             >
-              <div className="absolute top-2 left-6 w-8 h-10 bg-white/20 rounded-full blur-md" />
-              <span className="text-5xl md:text-8xl font-black text-white pointer-events-none select-none drop-shadow-[0_4px_4px_rgba(0,0,0,0.3)]">
+              <div className="absolute top-4 left-6 w-12 h-16 bg-white/30 rounded-full blur-lg" />
+              <span className="text-7xl md:text-9xl font-black text-white drop-shadow-lg select-none">
                 {balloon.char}
               </span>
-              <div className="absolute top-full left-1/2 w-1 h-32 bg-sky-200/40 -translate-x-1/2 pointer-events-none" />
+              {/* Blast Effect - Internal particles that appear on exit */}
+              <motion.div 
+                className="absolute inset-0 pointer-events-none"
+                initial={{ opacity: 0 }}
+                exit={{ opacity: 1 }}
+              >
+                <div className="absolute top-0 left-1/2 w-4 h-4 bg-white rounded-full translate-x-10 translate-y-10" />
+                <div className="absolute top-1/2 left-0 w-4 h-4 bg-white rounded-full -translate-x-10" />
+                <div className="absolute bottom-0 right-0 w-4 h-4 bg-white rounded-full" />
+              </motion.div>
             </motion.div>
           ))}
         </AnimatePresence>
       </div>
-
-      <div className="w-full z-20">
-        <VirtualKeyboard onKey={processKey} />
-      </div>
       
-      <p className="mt-4 text-sky-800 font-black text-xl uppercase tracking-widest opacity-50">
-        Pop the 3D Balloons! 🎈
-      </p>
+      <div className="flex items-center gap-4 mb-2">
+        <div className="w-5 h-5 rounded-full bg-red-400 animate-bounce" />
+        <div className="w-5 h-5 rounded-full bg-blue-400 animate-bounce delay-100" />
+        <div className="w-5 h-5 rounded-full bg-green-400 animate-bounce delay-200" />
+      </div>
     </div>
   );
 };

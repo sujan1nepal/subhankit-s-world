@@ -1,80 +1,104 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import confetti from 'canvas-confetti';
-import VirtualKeyboard from './VirtualKeyboard.tsx';
 
 interface Props {
   onBack: () => void;
   speak: (t: string) => void;
 }
 
-const DUCK_IMAGE = 'https://images.unsplash.com/photo-1555854817-2b214be2eff2?w=400&q=80';
+const DUCK_IMAGE = 'https://images.unsplash.com/photo-1563409236302-8442b5e644df?w=400&h=400&fit=crop';
 
 const NumberPark: React.FC<Props> = ({ speak }) => {
   const [targetNum, setTargetNum] = useState(1);
   const [objects, setObjects] = useState<number[]>([]);
 
-  const generateChallenge = () => {
+  const generateChallenge = useCallback(() => {
     const num = Math.floor(Math.random() * 9) + 1;
     setTargetNum(num);
     setObjects(Array.from({ length: num }, (_, i) => i));
-    speak(`Let's count the fluffy ducks together! How many ducks can you see?`);
-  };
+    speak(`How many fluffy ducks can you count? Type the number on your keyboard!`);
+  }, [speak]);
 
   useEffect(() => {
     generateChallenge();
-  }, []);
+  }, [generateChallenge]);
 
-  const processKey = (key: string) => {
+  const processKey = useCallback((key: string) => {
     const num = parseInt(key);
+    if (isNaN(num)) return;
+    
     if (num === targetNum) {
       handleSuccess();
-    } else if (!isNaN(num)) {
-      speak(`Not ${num}. Let's count them one by one. 1, 2, 3... can you find ${targetNum}?`);
+    } else {
+      speak(`That's ${num}. Let's count again! Find the number ${targetNum}!`);
     }
-  };
+  }, [targetNum, speak]);
+
+  useEffect(() => {
+    const handleKeydown = (e: KeyboardEvent) => {
+      if (/^[0-9]$/.test(e.key)) {
+        processKey(e.key);
+      }
+    };
+    window.addEventListener('keydown', handleKeydown);
+    return () => window.removeEventListener('keydown', handleKeydown);
+  }, [processKey]);
 
   const handleSuccess = () => {
-    speak(`Yes! That's exactly ${targetNum} ducks! You are so good at counting!`);
+    speak(`Yay! ${targetNum}! You're so smart!`);
     confetti({ 
       particleCount: 150, 
-      spread: 80, 
-      origin: { y: 0.7 },
-      colors: ['#a855f7', '#d8b4fe', '#ffffff']
+      spread: 120, 
+      origin: { y: 0.6 },
+      colors: ['#a855f7', '#ffffff', '#fbbf24']
     });
-    setTimeout(generateChallenge, 4000);
+    setTimeout(generateChallenge, 3000);
   };
 
   return (
-    <div className="w-full h-full bg-[#f5f3ff] flex flex-col items-center p-8 perspective-container">
-      <h2 className="text-4xl md:text-7xl font-black text-purple-600 mb-10 drop-shadow-md">Number Park</h2>
-
-      <div className="flex-grow w-full max-w-6xl bg-white rounded-[4rem] shadow-2xl border-8 border-purple-200 p-12 flex flex-wrap justify-center items-center gap-8 overflow-hidden clay-card">
-        <AnimatePresence>
-          {objects.map((id) => (
-            <motion.div
-              key={id}
-              initial={{ scale: 0, rotate: -45, y: 50 }}
-              animate={{ scale: 1, rotate: 0, y: 0 }}
-              transition={{ type: 'spring', damping: 15, stiffness: 200, delay: id * 0.1 }}
-              className="w-32 h-32 md:w-48 md:h-48 rounded-[2.5rem] overflow-hidden shadow-xl border-4 border-purple-100 p-2 bg-white clay-btn cursor-pointer"
-              whileHover={{ scale: 1.1, rotate: 5 }}
-              whileTap={{ scale: 0.9 }}
-              onClick={() => speak(String(id + 1))}
-            >
-              <img src={DUCK_IMAGE} alt="duck" className="w-full h-full object-cover rounded-3xl" />
-              <div className="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity bg-purple-500/20">
-                <span className="text-white text-6xl font-black drop-shadow-lg">{id + 1}</span>
-              </div>
-            </motion.div>
-          ))}
-        </AnimatePresence>
+    <div className="w-full h-full bg-[#f5f3ff] flex flex-col items-center p-4 overflow-hidden">
+      <div className="text-center shrink-0 mb-4 mt-2">
+        <h2 className="text-4xl md:text-7xl font-black text-purple-600 drop-shadow-sm uppercase tracking-tighter">Number Park</h2>
+        <div className="mt-1 bg-white/60 px-6 py-1 rounded-full border-2 border-purple-200 inline-block">
+          <p className="text-purple-800 font-black text-lg md:text-xl uppercase tracking-widest">
+            Type the number! 🦆
+          </p>
+        </div>
       </div>
 
-      <div className="mt-12 w-full flex flex-col items-center gap-6">
-        <p className="text-purple-900 text-3xl font-black uppercase tracking-widest italic opacity-70">How many ducks? Tap the number:</p>
-        <VirtualKeyboard type="numbers" onKey={processKey} />
+      <div className="flex-grow w-full max-w-7xl flex items-center justify-center p-4">
+        <div className="bg-white/90 rounded-[3rem] shadow-xl border-4 border-purple-200 p-8 flex flex-wrap justify-center items-center gap-4 w-full h-full max-h-[70vh] clay-card overflow-hidden">
+          <AnimatePresence mode="popLayout">
+            {objects.map((id) => (
+              <motion.div
+                key={id}
+                initial={{ scale: 0, rotate: -20 }}
+                animate={{ scale: 1, rotate: 0 }}
+                exit={{ scale: 0, opacity: 0 }}
+                transition={{ type: 'spring', damping: 15, stiffness: 200 }}
+                className="w-24 h-24 sm:w-32 sm:h-32 md:w-44 md:h-44 rounded-[2rem] overflow-hidden shadow-lg border-2 border-purple-100 p-2 bg-white clay-btn shrink-0"
+              >
+                <img 
+                  src={DUCK_IMAGE} 
+                  alt="duck" 
+                  className="w-full h-full object-cover rounded-[1.5rem]" 
+                />
+              </motion.div>
+            ))}
+          </AnimatePresence>
+        </div>
+      </div>
+
+      <div className="mb-4 shrink-0">
+        <motion.div 
+          animate={{ y: [0, -5, 0] }}
+          transition={{ duration: 2, repeat: Infinity }}
+          className="bg-purple-600 px-8 py-3 rounded-full shadow-lg text-white font-black text-xl uppercase italic"
+        >
+          Count them all!
+        </motion.div>
       </div>
     </div>
   );

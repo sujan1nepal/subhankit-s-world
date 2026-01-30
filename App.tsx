@@ -35,11 +35,11 @@ const App: React.FC = () => {
 
   const [showSettings, setShowSettings] = useState(false);
   const femaleVoiceRef = useRef<SpeechSynthesisVoice | null>(null);
+  const bgMusicRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
     const loadVoices = () => {
       const voices = window.speechSynthesis.getVoices();
-      // Try to find a soothing female voice
       const preferred = voices.find(v => 
         (v.name.includes('Female') || v.name.includes('Google US English') || v.name.includes('Samantha') || v.name.includes('Victoria')) && v.lang.startsWith('en')
       );
@@ -49,6 +49,14 @@ const App: React.FC = () => {
     loadVoices();
     window.speechSynthesis.onvoiceschanged = loadVoices;
   }, []);
+
+  useEffect(() => {
+    if (settings.voiceEnabled) {
+      bgMusicRef.current?.play().catch(() => {});
+    } else {
+      bgMusicRef.current?.pause();
+    }
+  }, [settings.voiceEnabled]);
 
   useEffect(() => {
     localStorage.setItem('userSettings', JSON.stringify(settings));
@@ -65,14 +73,15 @@ const App: React.FC = () => {
     if (femaleVoiceRef.current) {
       utterance.voice = femaleVoiceRef.current;
     }
-    utterance.rate = 0.85; // Slightly slower for soothing effect
-    utterance.pitch = 1.15; // Slightly higher for friendly tone
+    // Playful lady voice settings
+    utterance.rate = 1.1; 
+    utterance.pitch = 1.3; 
     window.speechSynthesis.speak(utterance);
   }, [settings.voiceEnabled]);
 
   useEffect(() => {
     if (gameState === GameState.HUB) {
-      speak(`Welcome back to the neighborhood, ${settings.userName}! Where shall we play today?`);
+      speak(`Hey ${settings.userName}! Let's find something fun to do!`);
     }
   }, [gameState, settings.userName, speak]);
 
@@ -94,6 +103,14 @@ const App: React.FC = () => {
 
   return (
     <div className="relative w-screen h-screen overflow-hidden bg-[#e0f2fe] perspective-container">
+      {/* Background Music */}
+      <audio 
+        ref={bgMusicRef} 
+        src="https://cdn.pixabay.com/download/audio/2022/02/10/audio_5101689255.mp3" 
+        loop 
+        autoPlay={settings.voiceEnabled}
+      />
+
       <AnimatePresence mode="wait">
         <motion.div
           key={gameState}
@@ -161,7 +178,7 @@ const App: React.FC = () => {
               exit={{ y: 100, scale: 0.8 }}
               className="bg-white rounded-[3rem] p-10 max-w-md w-full shadow-2xl clay-card"
             >
-              <h2 className="text-4xl font-black mb-8 text-blue-600 text-center">Settings</h2>
+              <h2 className="text-4xl font-black mb-8 text-blue-600 text-center uppercase">Settings</h2>
               <div className="space-y-6">
                 <div>
                   <label className="block text-gray-500 mb-2 font-black uppercase tracking-widest text-sm">Your Name</label>
@@ -179,7 +196,7 @@ const App: React.FC = () => {
                 onClick={() => setShowSettings(false)}
                 className="mt-10 w-full bg-blue-500 text-white p-6 rounded-3xl text-2xl font-black shadow-xl clay-btn"
               >
-                SAVE & PLAY!
+                GO PLAY!
               </motion.button>
             </motion.div>
           </motion.div>

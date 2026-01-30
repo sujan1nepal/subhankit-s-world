@@ -1,0 +1,7 @@
+{
+  "name": "Magic World Adventure",
+  "description": "An interactive, educational learning game for 4-year-olds featuring color sorting, animal sounds, letter typing, and more.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}

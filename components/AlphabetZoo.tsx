@@ -47,7 +47,7 @@ const AlphabetZoo: React.FC<Props> = ({ speak }) => {
 
   const handleSuccess = () => {
     setStatus('success');
-    speak(`You got it! ${animal.char} is for ${animal.name}!`);
+    speak(`Perfect! ${animal.char} is for ${animal.name}!`);
     confetti({ 
       particleCount: 100, 
       spread: 70, 
@@ -62,46 +62,46 @@ const AlphabetZoo: React.FC<Props> = ({ speak }) => {
 
   const handleFail = () => {
     setStatus('fail');
-    speak(`Oops! Can you find the letter ${animal.char}?`);
+    speak(`Oops! Can you find ${animal.char}?`);
     setTimeout(() => setStatus('idle'), 800);
   };
 
   return (
-    <div className="w-full h-full bg-[#fefce8] flex flex-col items-center p-4 md:p-8 overflow-hidden">
-      <div className="text-center shrink-0 mb-4">
-        <h2 className="text-4xl md:text-6xl font-black text-yellow-600 drop-shadow-sm uppercase tracking-tighter">Alphabet Zoo</h2>
+    <div className="w-full h-full bg-[#fefce8] flex flex-col items-center p-2 md:p-4 overflow-hidden">
+      <div className="text-center shrink-0 mb-2 mt-1">
+        <h2 className="text-3xl md:text-5xl font-black text-yellow-600 drop-shadow-sm uppercase">Alphabet Zoo</h2>
       </div>
 
-      <div className="flex-grow flex items-center justify-center w-full max-w-6xl min-h-0">
+      <div className="flex-grow flex items-center justify-center w-full max-w-6xl min-h-0 p-2">
         <AnimatePresence mode="wait">
           <motion.div
             key={animal.char}
-            initial={{ opacity: 0, scale: 0.8 }}
+            initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 1.1 }}
-            className="flex flex-col items-center bg-white p-6 md:p-10 rounded-[4rem] shadow-2xl border-[16px] border-yellow-100 w-full h-full clay-card overflow-hidden"
+            className="flex flex-col items-center bg-white p-4 md:p-6 rounded-[4rem] shadow-2xl border-[12px] border-yellow-100 w-full h-full clay-card overflow-hidden"
           >
-            <div className="flex-grow w-full rounded-[2.5rem] overflow-hidden mb-6 shadow-inner border-4 border-yellow-50 relative">
-              <img src={animal.img} alt={animal.name} className="w-full h-full object-cover" />
+            <div className="flex-grow w-full rounded-[2.5rem] overflow-hidden mb-4 shadow-inner border-2 border-yellow-50 relative bg-yellow-50/30">
+              <img src={animal.img} alt={animal.name} className="w-full h-full object-contain" />
               {status === 'success' && (
                 <motion.div 
                   initial={{ opacity: 0 }} 
                   animate={{ opacity: 1 }} 
-                  className="absolute inset-0 bg-yellow-400/20 backdrop-blur-sm flex items-center justify-center"
+                  className="absolute inset-0 bg-yellow-400/10 backdrop-blur-[2px] flex items-center justify-center"
                 >
                   <span className="text-white text-9xl font-black drop-shadow-lg">✨</span>
                 </motion.div>
               )}
             </div>
             
-            <div className="flex flex-wrap items-center justify-center gap-8 text-center shrink-0">
+            <div className="flex items-center justify-center gap-6 text-center shrink-0 p-2">
               <motion.div
-                animate={status === 'success' ? { scale: [1, 1.3, 1], rotate: [0, 10, -10, 0] } : {}}
-                className={`text-8xl md:text-[12rem] font-black leading-none drop-shadow-md ${status === 'fail' ? 'text-red-500 animate-shake' : 'text-yellow-600'}`}
+                animate={status === 'success' ? { scale: [1, 1.2, 1] } : {}}
+                className={`text-7xl md:text-[8rem] font-black leading-none drop-shadow-md ${status === 'fail' ? 'text-red-500 animate-shake' : 'text-yellow-600'}`}
               >
                 {animal.char}
               </motion.div>
-              <div className="text-4xl md:text-7xl font-black text-gray-800 italic uppercase tracking-tighter">
+              <div className="text-3xl md:text-6xl font-black text-gray-800 italic uppercase">
                 {animal.name}
               </div>
             </div>
@@ -109,10 +109,10 @@ const AlphabetZoo: React.FC<Props> = ({ speak }) => {
         </AnimatePresence>
       </div>
       
-      <div className="mt-4 shrink-0">
-        <div className="bg-yellow-100 px-6 py-2 rounded-full border-2 border-yellow-200 shadow-sm">
-          <span className="text-yellow-700 text-lg md:text-xl font-bold uppercase tracking-widest">
-            Press "{animal.char}" ⌨️
+      <div className="mt-2 mb-2 shrink-0">
+        <div className="bg-yellow-500 px-6 py-2 rounded-full shadow-md">
+          <span className="text-white text-lg font-black uppercase tracking-widest italic">
+            Find the "{animal.char}" key! ⌨️
           </span>
         </div>
       </div>

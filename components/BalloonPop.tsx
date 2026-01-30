@@ -28,6 +28,7 @@ const COLORS = [
 
 const BalloonPop: React.FC<Props> = ({ speak }) => {
   const [balloons, setBalloons] = useState<Balloon[]>([]);
+  const [score, setScore] = useState(0);
   const balloonsRef = useRef<Balloon[]>([]);
 
   useEffect(() => {
@@ -36,6 +37,7 @@ const BalloonPop: React.FC<Props> = ({ speak }) => {
 
   const pop = useCallback((id: number, char: string) => {
     setBalloons(prev => prev.filter(b => b.id !== id));
+    setScore(s => s + 1);
     speak(`Pop! ${char}!`);
   }, [speak]);
 
@@ -44,7 +46,7 @@ const BalloonPop: React.FC<Props> = ({ speak }) => {
     const newBalloon: Balloon = {
       id: Date.now() + Math.random(),
       char,
-      x: 10 + Math.random() * 80,
+      x: 5 + Math.random() * 85,
       color: COLORS[Math.floor(Math.random() * COLORS.length)],
       depth: Math.random() * 100,
       speed: 10 + Math.random() * 8
@@ -53,7 +55,7 @@ const BalloonPop: React.FC<Props> = ({ speak }) => {
   }, []);
 
   useEffect(() => {
-    const interval = setInterval(spawnBalloon, 1400);
+    const interval = setInterval(spawnBalloon, 1300);
     return () => clearInterval(interval);
   }, [spawnBalloon]);
 
@@ -71,18 +73,26 @@ const BalloonPop: React.FC<Props> = ({ speak }) => {
 
   return (
     <div className="w-full h-full bg-sky-50 flex flex-col items-center p-4 overflow-hidden">
-      <div className="z-10 text-center mb-4 shrink-0 mt-2">
-        <h2 className="text-4xl md:text-7xl font-black text-sky-600 uppercase tracking-tighter drop-shadow-sm">
-          Balloon Pop!
-        </h2>
-        <div className="mt-1 bg-white/70 backdrop-blur-md px-8 py-2 rounded-full border border-sky-200 shadow-sm inline-block">
-          <p className="text-sky-800 font-black text-lg md:text-xl uppercase tracking-widest">
-            Type the letter to pop! 🎈
-          </p>
+      <div className="z-10 w-full max-w-7xl flex justify-between items-center mb-4 shrink-0 px-6">
+        <div className="text-left">
+          <h2 className="text-4xl md:text-7xl font-black text-sky-600 uppercase tracking-tighter drop-shadow-sm">
+            Balloon Pop!
+          </h2>
+        </div>
+        <div className="bg-white/80 p-4 rounded-3xl shadow-xl border-4 border-sky-100 flex items-center gap-4">
+          <span className="text-sky-400 text-2xl font-black">SCORE:</span>
+          <motion.span 
+            key={score}
+            initial={{ scale: 1.5, color: '#0ea5e9' }}
+            animate={{ scale: 1, color: '#0284c7' }}
+            className="text-5xl font-black text-sky-600"
+          >
+            {score}
+          </motion.span>
         </div>
       </div>
 
-      <div className="flex-grow w-full relative overflow-hidden rounded-[3rem] bg-sky-100/40 border-[12px] border-white shadow-2xl clay-card mb-4">
+      <div className="flex-grow w-full max-w-7xl relative overflow-hidden rounded-[4rem] bg-sky-100/40 border-[16px] border-white shadow-2xl clay-card mb-4">
         <AnimatePresence>
           {balloons.map(balloon => (
             <motion.div
@@ -90,39 +100,37 @@ const BalloonPop: React.FC<Props> = ({ speak }) => {
               initial={{ y: '120%', opacity: 0, scale: 0.8 }}
               animate={{ y: '-40%', opacity: 1, scale: 1 }}
               exit={{ 
-                scale: [1, 2.5], 
+                scale: [1, 3, 4], 
                 opacity: 0, 
-                rotate: [0, 20],
-                transition: { duration: 0.2 } 
+                rotate: [0, 45],
+                transition: { duration: 0.3 } 
               }}
               transition={{ duration: balloon.speed, ease: 'linear' }}
-              className={`absolute w-32 h-44 md:w-48 md:h-64 rounded-full ${balloon.color} border-4 border-white/40 flex items-center justify-center cursor-pointer z-[${Math.round(balloon.depth)}] clay-btn`}
+              className={`absolute w-36 h-48 md:w-52 md:h-72 rounded-full ${balloon.color} border-4 border-white/40 flex items-center justify-center cursor-pointer z-[${Math.round(balloon.depth)}] clay-btn`}
               style={{ left: `${balloon.x}%` }}
               onClick={() => pop(balloon.id, balloon.char)}
             >
-              <div className="absolute top-4 left-6 w-12 h-16 bg-white/30 rounded-full blur-lg" />
-              <span className="text-7xl md:text-9xl font-black text-white drop-shadow-lg select-none">
+              <div className="absolute top-4 left-6 w-14 h-18 bg-white/30 rounded-full blur-lg" />
+              <span className="text-8xl md:text-[10rem] font-black text-white drop-shadow-lg select-none">
                 {balloon.char}
               </span>
-              {/* Blast Effect - Internal particles that appear on exit */}
-              <motion.div 
-                className="absolute inset-0 pointer-events-none"
-                initial={{ opacity: 0 }}
-                exit={{ opacity: 1 }}
-              >
-                <div className="absolute top-0 left-1/2 w-4 h-4 bg-white rounded-full translate-x-10 translate-y-10" />
-                <div className="absolute top-1/2 left-0 w-4 h-4 bg-white rounded-full -translate-x-10" />
-                <div className="absolute bottom-0 right-0 w-4 h-4 bg-white rounded-full" />
-              </motion.div>
+              
+              {/* Pop Blast Effect Overlay */}
+              <AnimatePresence>
+                {/* Visual particles on exit are handled by the exit transition above, 
+                    but we can add extra flare here */}
+              </AnimatePresence>
+              
+              <div className="absolute top-full left-1/2 w-[3px] h-48 bg-sky-300/40 -translate-x-1/2 pointer-events-none" />
             </motion.div>
           ))}
         </AnimatePresence>
       </div>
       
-      <div className="flex items-center gap-4 mb-2">
-        <div className="w-5 h-5 rounded-full bg-red-400 animate-bounce" />
-        <div className="w-5 h-5 rounded-full bg-blue-400 animate-bounce delay-100" />
-        <div className="w-5 h-5 rounded-full bg-green-400 animate-bounce delay-200" />
+      <div className="mb-2 shrink-0 bg-sky-600 px-8 py-2 rounded-full shadow-lg">
+        <p className="text-white font-black text-xl uppercase tracking-widest italic">
+          Type the letter!
+        </p>
       </div>
     </div>
   );

@@ -10,6 +10,8 @@ export enum GameState {
   ROCKET_LAUNCHER = 'ROCKET_LAUNCHER',
   BALLOON_POP = 'BALLOON_POP',
   NUMBER_PARK = 'NUMBER_PARK',
+  WORD_LAB = 'WORD_LAB',
+  RACING_GAME = 'RACING_GAME',
   ADMIN = 'ADMIN'
 }
 
@@ -18,8 +20,9 @@ export interface UserSettings {
   voiceEnabled: boolean;
 }
 
-export interface CarWashImage {
+export interface WashItem {
   id: string;
-  url: string;
+  icon: string;
   name: string;
+  color: string;
 }

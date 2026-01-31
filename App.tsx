@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Home, Settings, Volume2, VolumeX, ShieldAlert } from 'lucide-react';
-import { GameState, UserSettings, CarWashImage } from './types.ts';
+import { GameState, UserSettings, WashItem } from './types.ts';
 import Neighborhood from './components/Neighborhood.tsx';
 import MusicShop from './components/MusicShop.tsx';
 import SortingGarden from './components/SortingGarden.tsx';
@@ -13,12 +13,66 @@ import AlphabetZoo from './components/AlphabetZoo.tsx';
 import RocketLauncher from './components/RocketLauncher.tsx';
 import BalloonPop from './components/BalloonPop.tsx';
 import NumberPark from './components/NumberPark.tsx';
+import WordLab from './components/WordLab.tsx';
+import SpeedyRacer from './components/SpeedyRacer.tsx';
 import AdminPanel from './components/AdminPanel.tsx';
 
-const DEFAULT_IMAGES: CarWashImage[] = [
-  { id: '1', name: 'Sports Car', url: 'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?w=800&q=80' },
-  { id: '2', name: 'Dinosaur', url: 'https://images.unsplash.com/photo-1517930410339-01e350335e5a?w=800&q=80' },
-  { id: '3', name: 'Puppy', url: 'https://images.unsplash.com/photo-1589487391730-58f20eb2c308?w=800&q=80' },
+const DEFAULT_WASH_ITEMS: WashItem[] = [
+  // Animals
+  { id: 'a1', name: 'Lion', icon: '🦁', color: 'bg-orange-400' },
+  { id: 'a2', name: 'Elephant', icon: '🐘', color: 'bg-blue-300' },
+  { id: 'a3', name: 'Giraffe', icon: '🦒', color: 'bg-yellow-400' },
+  { id: 'a4', name: 'Monkey', icon: '🐒', color: 'bg-amber-600' },
+  { id: 'a5', name: 'Tiger', icon: '🐯', color: 'bg-orange-500' },
+  { id: 'a6', name: 'Panda', icon: '🐼', color: 'bg-slate-100' },
+  { id: 'a7', name: 'Zebra', icon: '🦓', color: 'bg-slate-200' },
+  { id: 'a8', name: 'Frog', icon: '🐸', color: 'bg-green-500' },
+  { id: 'a9', name: 'Pig', icon: '🐷', color: 'bg-pink-300' },
+  { id: 'a10', name: 'Chicken', icon: '🐔', color: 'bg-red-100' },
+  // Fruit/Food
+  { id: 'f1', name: 'Apple', icon: '🍎', color: 'bg-red-500' },
+  { id: 'f2', name: 'Banana', icon: '🍌', color: 'bg-yellow-200' },
+  { id: 'f3', name: 'Watermelon', icon: '🍉', color: 'bg-green-600' },
+  { id: 'f4', name: 'Grapes', icon: '🍇', color: 'bg-purple-500' },
+  { id: 'f5', name: 'Strawberry', icon: '🍓', color: 'bg-rose-400' },
+  { id: 'f6', name: 'Pineapple', icon: '🍍', color: 'bg-yellow-500' },
+  { id: 'f7', name: 'Donut', icon: '🍩', color: 'bg-pink-400' },
+  { id: 'f8', name: 'Pizza', icon: '🍕', color: 'bg-orange-300' },
+  { id: 'f9', name: 'Ice Cream', icon: '🍦', color: 'bg-cyan-100' },
+  { id: 'f10', name: 'Cookie', icon: '🍪', color: 'bg-amber-800' },
+  // Vehicles
+  { id: 'v1', name: 'Race Car', icon: '🏎️', color: 'bg-red-600' },
+  { id: 'v2', name: 'Fire Truck', icon: '🚒', color: 'bg-red-700' },
+  { id: 'v3', name: 'Police Car', icon: '🚓', color: 'bg-blue-800' },
+  { id: 'v4', name: 'School Bus', icon: '🚌', color: 'bg-yellow-500' },
+  { id: 'v5', name: 'Rocket', icon: '🚀', color: 'bg-indigo-600' },
+  { id: 'v6', name: 'Train', icon: '🚂', color: 'bg-slate-400' },
+  { id: 'v7', name: 'Airplane', icon: '✈️', color: 'bg-sky-400' },
+  { id: 'v8', name: 'Helicopter', icon: '🚁', color: 'bg-teal-500' },
+  { id: 'v9', name: 'Tractor', icon: '🚜', color: 'bg-lime-600' },
+  { id: 'v10', name: 'Boat', icon: '⛵', color: 'bg-blue-400' },
+  // Nature/Places
+  { id: 'n1', name: 'Rainbow', icon: '🌈', color: 'bg-sky-200' },
+  { id: 'n2', name: 'Sun', icon: '☀️', color: 'bg-yellow-300' },
+  { id: 'n3', name: 'Moon', icon: '🌙', color: 'bg-indigo-900' },
+  { id: 'n4', name: 'Star', icon: '⭐', color: 'bg-amber-400' },
+  { id: 'n5', name: 'Flower', icon: '🌸', color: 'bg-pink-200' },
+  { id: 'n6', name: 'Tree', icon: '🌳', color: 'bg-emerald-400' },
+  { id: 'n7', name: 'Cactus', icon: '🌵', color: 'bg-green-700' },
+  { id: 'n8', name: 'Cloud', icon: '☁️', color: 'bg-blue-50' },
+  { id: 'n9', name: 'Earth', icon: '🌍', color: 'bg-blue-600' },
+  { id: 'n10', name: 'Volcano', icon: '🌋', color: 'bg-stone-500' },
+  // Toys/Shapes
+  { id: 't1', name: 'Teddy Bear', icon: '🧸', color: 'bg-orange-200' },
+  { id: 't2', name: 'Balloon', icon: '🎈', color: 'bg-red-400' },
+  { id: 't3', name: 'Gift', icon: '🎁', color: 'bg-purple-400' },
+  { id: 't4', name: 'Robot', icon: '🤖', color: 'bg-slate-300' },
+  { id: 't5', name: 'Alien', icon: '👽', color: 'bg-lime-400' },
+  { id: 't6', name: 'Magic Wand', icon: '🪄', color: 'bg-indigo-400' },
+  { id: 't7', name: 'Crown', icon: '👑', color: 'bg-yellow-500' },
+  { id: 't8', name: 'Ball', icon: '⚽', color: 'bg-white' },
+  { id: 't9', name: 'Heart', icon: '❤️', color: 'bg-rose-500' },
+  { id: 't10', name: 'Unicorn', icon: '🦄', color: 'bg-pink-100' },
 ];
 
 const App: React.FC = () => {
@@ -28,9 +82,9 @@ const App: React.FC = () => {
     return saved ? JSON.parse(saved) : { userName: 'Explorer', voiceEnabled: true };
   });
   
-  const [customImages, setCustomImages] = useState<CarWashImage[]>(() => {
-    const saved = localStorage.getItem('carWashImages');
-    return saved ? JSON.parse(saved) : DEFAULT_IMAGES;
+  const [washItems, setWashItems] = useState<WashItem[]>(() => {
+    const saved = localStorage.getItem('washItems');
+    return saved ? JSON.parse(saved) : DEFAULT_WASH_ITEMS;
   });
 
   const [showSettings, setShowSettings] = useState(false);
@@ -63,8 +117,8 @@ const App: React.FC = () => {
   }, [settings]);
 
   useEffect(() => {
-    localStorage.setItem('carWashImages', JSON.stringify(customImages));
-  }, [customImages]);
+    localStorage.setItem('washItems', JSON.stringify(washItems));
+  }, [washItems]);
 
   const speak = useCallback((text: string) => {
     if (!settings.voiceEnabled) return;
@@ -73,7 +127,6 @@ const App: React.FC = () => {
     if (femaleVoiceRef.current) {
       utterance.voice = femaleVoiceRef.current;
     }
-    // Playful lady voice settings
     utterance.rate = 1.1; 
     utterance.pitch = 1.3; 
     window.speechSynthesis.speak(utterance);
@@ -91,19 +144,20 @@ const App: React.FC = () => {
       case GameState.SORTING_GARDEN: return <SortingGarden onBack={() => setGameState(GameState.HUB)} speak={speak} />;
       case GameState.FOREST_OF_MYSTERY: return <ForestOfMystery onBack={() => setGameState(GameState.HUB)} speak={speak} />;
       case GameState.ART_STUDIO: return <ArtStudio onBack={() => setGameState(GameState.HUB)} speak={speak} />;
-      case GameState.CAR_WASH: return <CarWash onBack={() => setGameState(GameState.HUB)} speak={speak} images={customImages} />;
+      case GameState.CAR_WASH: return <CarWash onBack={() => setGameState(GameState.HUB)} speak={speak} items={washItems} />;
       case GameState.ALPHABET_ZOO: return <AlphabetZoo onBack={() => setGameState(GameState.HUB)} speak={speak} />;
       case GameState.ROCKET_LAUNCHER: return <RocketLauncher onBack={() => setGameState(GameState.HUB)} speak={speak} />;
       case GameState.BALLOON_POP: return <BalloonPop onBack={() => setGameState(GameState.HUB)} speak={speak} />;
       case GameState.NUMBER_PARK: return <NumberPark onBack={() => setGameState(GameState.HUB)} speak={speak} />;
-      case GameState.ADMIN: return <AdminPanel images={customImages} setImages={setCustomImages} onBack={() => setGameState(GameState.HUB)} />;
+      case GameState.WORD_LAB: return <WordLab onBack={() => setGameState(GameState.HUB)} speak={speak} />;
+      case GameState.RACING_GAME: return <SpeedyRacer onBack={() => setGameState(GameState.HUB)} speak={speak} />;
+      case GameState.ADMIN: return <AdminPanel items={washItems} setItems={setWashItems} onBack={() => setGameState(GameState.HUB)} />;
       default: return <Neighborhood onSelectGame={(game) => setGameState(game)} userName={settings.userName} />;
     }
   };
 
   return (
     <div className="relative w-screen h-screen overflow-hidden bg-[#e0f2fe] perspective-container">
-      {/* Background Music */}
       <audio 
         ref={bgMusicRef} 
         src="https://cdn.pixabay.com/download/audio/2022/02/10/audio_5101689255.mp3" 

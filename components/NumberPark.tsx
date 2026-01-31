@@ -60,15 +60,13 @@ const NumberPark: React.FC<Props> = ({ speak }) => {
   };
 
   return (
-    <div className="w-full h-full bg-[#f5f3ff] flex flex-col items-center p-2 md:p-4 overflow-hidden">
-      {/* Smaller Header to save space */}
+    <div className="w-full h-full bg-[#f5f3ff] flex flex-col items-center p-4 overflow-hidden">
       <div className="text-center shrink-0 mb-2 mt-2">
         <h2 className="text-3xl md:text-5xl font-black text-purple-600 drop-shadow-sm uppercase tracking-tighter">Number Park</h2>
       </div>
 
-      {/* Large flexible container for ducks */}
       <div className="flex-grow w-full max-w-7xl flex items-center justify-center p-2 min-h-0">
-        <div className="bg-white/95 rounded-[3rem] shadow-2xl border-4 border-purple-100 p-4 md:p-6 flex flex-wrap justify-center items-center gap-3 md:gap-6 w-full h-full clay-card overflow-hidden content-center">
+        <div className="bg-white/95 rounded-[3rem] shadow-2xl border-4 border-purple-100 p-4 md:p-8 flex flex-wrap justify-center items-center gap-2 md:gap-4 w-full h-full clay-card overflow-hidden content-center">
           <AnimatePresence mode="popLayout">
             {objects.map((id) => (
               <motion.div
@@ -77,12 +75,12 @@ const NumberPark: React.FC<Props> = ({ speak }) => {
                 animate={{ scale: 1, rotate: 0 }}
                 exit={{ scale: 0, opacity: 0 }}
                 transition={{ type: 'spring', damping: 20, stiffness: 300 }}
-                className="w-20 h-20 sm:w-32 sm:h-32 md:w-44 md:h-44 lg:w-56 lg:h-56 rounded-[2.5rem] overflow-hidden shadow-lg border-2 border-purple-50 p-2 bg-white clay-btn shrink-0"
+                className="w-20 h-20 sm:w-32 sm:h-32 md:w-40 md:h-40 lg:w-48 lg:h-48 rounded-[2rem] md:rounded-[3rem] overflow-hidden shadow-lg border-2 border-purple-50 p-1 md:p-2 bg-white clay-btn shrink-0"
               >
                 <img 
                   src={DUCK_IMAGE} 
                   alt="duck" 
-                  className="w-full h-full object-contain rounded-[1.5rem]" 
+                  className="w-full h-full object-contain rounded-[1.5rem] md:rounded-[2.5rem]" 
                 />
               </motion.div>
             ))}
@@ -90,7 +88,6 @@ const NumberPark: React.FC<Props> = ({ speak }) => {
         </div>
       </div>
 
-      {/* Combined Score and Instruction at bottom */}
       <div className="mt-4 mb-4 shrink-0 flex items-center gap-4">
         <div className="bg-purple-600 px-8 py-3 rounded-full shadow-lg border-b-4 border-purple-800">
           <span className="text-white text-xl md:text-2xl font-black uppercase tracking-widest italic">
@@ -104,7 +101,7 @@ const NumberPark: React.FC<Props> = ({ speak }) => {
             key={score}
             initial={{ scale: 1.5 }}
             animate={{ scale: 1 }}
-            className="text-3xl font-black text-purple-600"
+            className="text-3xl md:text-5xl font-black text-purple-600"
           >
             {score}
           </motion.span>
